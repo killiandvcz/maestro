@@ -1,6 +1,6 @@
 import { describe, test, expect, beforeEach, afterEach } from "bun:test";
 import { mock, spyOn } from "bun:test";
-import Maestro from "../src/index.js";
+import {Maestro} from "../src/index.js";
 
 describe('Maestro Timer Library', () => {
   let now = 0;
