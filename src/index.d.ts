@@ -1,22 +1,6 @@
-declare module 'maestro' {
-    /**
-     * Timer configuration options
-     */
-    export interface TimerConfig {
-      /** Timer delay in milliseconds */
-      delay?: number;
-      /** Callback context */
-      context?: any;
-      /** Callback arguments */
-      args?: any[];
-      /** Auto start after creation */
-      autoStart?: boolean;
-    }
-  
-    /**
-     * Timer internal state
-     */
-    export interface TimerState {
+// Type definitions for Maestro Timer Library
+declare module "@killiandvcz/maestro" {
+  export interface TimerState {
       /** When timer started */
       startTime: number;
       /** Time left in pause */
@@ -27,187 +11,186 @@ declare module 'maestro' {
       isPaused: boolean;
       /** Completion state */
       isCompleted: boolean;
-    }
-  
-    /**
-     * Group configuration options
-     */
-    export interface GroupConfig {
+  }
+
+  export interface TimerConfig {
+      /** Timer delay in milliseconds */
+      delay?: number;
+      /** Callback context */
+      context?: any;
+      /** Callback arguments */
+      args?: any[];
+      /** Auto start after creation */
+      autoStart?: boolean;
+  }
+
+  export interface GroupConfig {
       /** Group name */
       name?: string;
-      /** Whether timers should run synchronously */
+      /** Whether timers run synchronously */
       synchronous?: boolean;
-    }
-  
-    /**
-     * Timer class for managing individual timers
-     */
-    export class Timer {
-      /** Timer callback function */
-      callback: Function;
-      /** Timer delay in milliseconds */
-      delay: number;
-      /** Callback context */
-      context: any;
-      /** Callback arguments */
-      args: any[];
-      /** Groups this timer belongs to */
-      groups: Set<Group>;
-      /** Current timer state */
-      state: TimerState;
-  
+  }
+
+  export class Timer {
+      private callback: Function;
+      private delay: number;
+      private context: any;
+      private args: any[];
+      private groups: Set<Group>;
+      private state: TimerState;
+      private _onCompleteListeners: Set<(timer: Timer) => void>;
+
       constructor(callback: Function, config?: TimerConfig);
-  
+
+      private _cleanup(): void;
+      private _notifyGroups(): void;
+      private _handleComplete(): void;
+
       /**
        * Adds completion listener
-       * @param listener Callback when timer completes
+       * @param listener - Callback when timer completes
        */
-      onComplete(listener: (timer: Timer) => void): Timer;
-  
+      onComplete(listener: (timer: Timer) => void): this;
+
       /**
        * Links this timer to one or more groups
-       * @param groups Groups to link with
+       * @param groups - Groups to link with
        */
-      link(...groups: Group[]): Timer;
-  
+      link(...groups: Group[]): this;
+
       /**
        * Unlinks this timer from one or more groups
-       * @param groups Groups to unlink from
+       * @param groups - Groups to unlink from
        */
-      unlink(...groups: Group[]): Timer;
-  
+      unlink(...groups: Group[]): this;
+
       /**
        * Starts or resumes the timer
        */
-      start(): Timer;
-  
+      start(): this;
+
       /**
        * Pauses the timer
        */
-      pause(): Timer;
-  
+      pause(): this;
+
       /**
        * Resets and optionally restarts the timer
-       * @param autoStart Auto start after reset
+       * @param autoStart - Auto start after reset
        */
-      reset(autoStart?: boolean): Timer;
-  
+      reset(autoStart?: boolean): this;
+
       /**
        * Returns remaining time in milliseconds
        */
       getRemainingTime(): number;
-  
+
       /**
        * Checks if timer is active (started and not completed)
        */
       isActive(): boolean;
-    }
-  
-    /**
-     * Group class for managing multiple timers
-     */
-    export class Group {
-      /** Group name */
+  }
+
+  export class Group {
       name: string;
-      /** Whether timers should run synchronously */
       synchronous: boolean;
-      /** Set of timers in this group */
       timers: Set<Timer>;
-  
+      private _completedTimers: Set<Timer>;
+      private _onAllCompleteListeners: Set<(group: Group) => void>;
+
       constructor(config?: GroupConfig);
-  
+
+      /**
+       * Handles timer completion notification
+       */
+      private onTimerComplete(timer: Timer): void;
+
       /**
        * Adds listener for when all timers complete
-       * @param listener Callback when all complete
+       * @param listener - Callback when all complete
        */
-      onAllComplete(listener: (group: Group) => void): Group;
-  
+      onAllComplete(listener: (group: Group) => void): this;
+
       /**
        * Adds a timer to the group
-       * @param timer Timer instance
+       * @param timer - Timer instance
        */
-      add(timer: Timer): Group;
-  
+      add(timer: Timer): this;
+
       /**
        * Starts all timers in the group
        */
-      startAll(): Group;
-  
+      startAll(): this;
+
       /**
        * Pauses all timers in the group
        */
-      pauseAll(): Group;
-  
+      pauseAll(): this;
+
       /**
        * Resets all timers in the group
-       * @param autoStart Auto start after reset
+       * @param autoStart - Auto start after reset
        */
-      resetAll(autoStart?: boolean): Group;
-  
+      resetAll(autoStart?: boolean): this;
+
       /**
        * Links this group with one or more timers
-       * @param timers Timers to link with
+       * @param timers - Timers to link with
        */
-      link(...timers: Timer[]): Group;
-  
+      link(...timers: Timer[]): this;
+
       /**
-       * Removes timers from the group
-       * @param timers Timers to remove
+       * Removes a timer from the group
+       * @param timers - Timers to remove
        */
-      remove(...timers: Timer[]): Group;
-  
+      remove(...timers: Timer[]): this;
+
       /**
        * Returns active timers count
        */
       getActiveCount(): number;
-  
+
       /**
        * Executes callback when all timers complete
-       * @param callback Function to execute
+       * @param callback - Function to execute
        */
-      onComplete(callback: () => void): Group;
-  
+      onComplete(callback: () => void): this;
+
       /**
        * Restarts all timers with the same remaining time ratio
        */
-      restartSynchronized(): Group;
-    }
-  
-    /**
-     * Timer configuration with callback for sequence/sync methods
-     */
-    export interface TimerConfigWithCallback extends TimerConfig {
-      /** Timer callback function */
+      restartSynchronized(): this;
+  }
+
+  export interface TimerSequenceConfig extends TimerConfig {
       callback: Function;
-    }
-  
-    /**
-     * Main Maestro API
-     */
-    export default class Maestro {
+      delay: number;
+  }
+
+  export class Maestro {
       /**
        * Creates a new timer
-       * @param callback Timer callback function
-       * @param config Timer configuration
+       * @param callback - Timer callback function
+       * @param config - Timer configuration
        */
       static timer(callback: Function, config?: TimerConfig): Timer;
-  
+
       /**
        * Creates a new group
-       * @param options Group name or options
+       * @param options - Group name or configuration
        */
       static group(options?: string | GroupConfig): Group;
-  
+
       /**
        * Creates a chain of sequential timers
-       * @param timerConfigs Timer configurations
+       * @param timerConfigs - Timer configurations
        */
-      static sequence(...timerConfigs: TimerConfigWithCallback[]): Group;
-  
+      static sequence(...timerConfigs: TimerSequenceConfig[]): Group;
+
       /**
        * Creates multiple synchronized timers
-       * @param timerConfigs Timer configurations
+       * @param timerConfigs - Timer configurations
        */
-      static sync(...timerConfigs: TimerConfigWithCallback[]): Group;
-    }
+      static sync(...timerConfigs: TimerConfig[]): Group;
   }
+}

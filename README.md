@@ -27,7 +27,7 @@ npm install @killiandvcz/maestro
 ## 🎮 Quick Start
 
 ```javascript
-import Maestro from '@killiandvcz/maestro';
+import {Maestro} from '@killiandvcz/maestro';
 
 // Simple timer
 const timer = Maestro.timer(() => {
@@ -170,7 +170,7 @@ group.restartSynchronized();
 Maestro includes full TypeScript definitions. Import types as needed:
 
 ```typescript
-import Maestro, { Timer, Group, TimerConfig } from '@killiandvcz/maestro';
+import {Maestro, Timer, Group, TimerConfig } from '@killiandvcz/maestro';
 
 const config: TimerConfig = {
   delay: 1000,

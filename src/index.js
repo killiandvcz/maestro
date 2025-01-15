@@ -2,7 +2,7 @@
 * Internal Timer implementation
 * @private
 */
-class Timer {
+export class Timer {
     /**
     * @typedef {Object} TimerState
     * @property {number} startTime - When timer started
@@ -226,7 +226,7 @@ class Timer {
 * Internal Group implementation
 * @private
 */
-class Group {
+export class Group {
     /**
     * @param {Object} config Group configuration
     * @private
@@ -394,7 +394,7 @@ class Group {
 /**
 * Public Maestro API
 */
-class Maestro {
+export class Maestro {
     /**
     * Creates a new timer
     * * @param {Function} [callback] Callback if first param is delay
@@ -468,5 +468,3 @@ class Maestro {
         return group;
     }
 }
-
-export default Maestro;
