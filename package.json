@@ -1,0 +1,44 @@
+{
+  "name": "@killiandvcz/maestro",
+  "version": "1.0.0",
+  "description": "A powerful and flexible timer management library for JavaScript",
+  "type": "module",
+  "main": "src/index.js",
+  "types": "src/index.d.ts",
+  "files": [
+    "src/index.js",
+    "src/index.d.ts"
+  ],
+  "scripts": {
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "prepublishOnly": "npm test"
+  },
+  "keywords": [
+    "timer",
+    "timing",
+    "setTimeout",
+    "async",
+    "scheduler",
+    "sequence",
+    "synchronization"
+  ],
+  "author": "Killian Di Vincenzo",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/killiandvcz/maestro.git"
+  },
+  "bugs": {
+    "url": "https://github.com/killiandvcz/maestro/issues"
+  },
+  "homepage": "https://github.com/killiandvcz/maestro#readme",
+  "devDependencies": {
+    "jest": "^29.7.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
