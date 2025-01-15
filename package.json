@@ -10,8 +10,8 @@
     "src/index.d.ts"
   ],
   "scripts": {
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
-    "prepublishOnly": "npm test"
+    "test": "bun test",
+    "prepublishOnly": "bun test"
   },
   "keywords": [
     "timer",
