@@ -84,11 +84,32 @@ export class Timer {
     * @private
     */
     _handleComplete() {
-        this.callback.apply(this.context, this.args);
+        // On marque comme complété tout de suite
         this.state.isCompleted = true;
-        this._cleanup();
-        this._notifyGroups();
-        this._onCompleteListeners.forEach(listener => listener(this));
+        
+        // On met le nettoyage dans une microtask
+        queueMicrotask(() => {
+            try {
+                // On exécute le callback
+                this.callback.apply(this.context, this.args);
+                
+                // Nettoyage basique
+                this._cleanup();
+                
+                // Notifications
+                this._notifyGroups();
+                this._onCompleteListeners.forEach(listener => {
+                    try {
+                        listener(this);
+                    } catch (e) {
+                        console.error('Error in completion listener:', e);
+                    }
+                });
+            } finally {
+                // On s'assure de toujours disposer, même en cas d'erreur
+                this.dispose();
+            }
+        });
     }
     
     /**
@@ -220,6 +241,36 @@ export class Timer {
     isActive() {
         return !!this.state.timeoutId && !this.state.isCompleted;
     }
+    
+    /**
+     * Dispose timer
+     */
+    dispose() {
+        if (this.state.timeoutId) {
+            clearTimeout(this.state.timeoutId);
+        }
+        this._cleanup();
+        this._onCompleteListeners.clear();
+        // Détacher de tous les groupes
+        this.groups.forEach(group => {
+            group.timers.delete(this);
+        });
+        this.groups.clear();
+    }
+
+    /**
+     * Clear timer
+     * @returns {Timer}
+     */
+    clear() {
+        // Annule le timer en cours s'il existe
+        if (this.state.timeoutId) {
+            clearTimeout(this.state.timeoutId);
+        }
+        // Nettoie toutes les références
+        this.dispose();
+        return this; // Pour le chaînage
+    }
 }
 
 /**
@@ -339,6 +390,15 @@ export class Group {
             timer.groups.delete(this);
         });
         return this;
+    }
+
+    dispose() {
+        this.timers.forEach(timer => {
+            timer.groups.delete(this);
+        });
+        this.timers.clear();
+        this._completedTimers.clear();
+        this._onAllCompleteListeners.clear();
     }
     
     /**

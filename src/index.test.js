@@ -244,8 +244,7 @@ describe('Maestro Timer Library', () => {
             delay: 0
         });
         
-        // Attendre que la microtask queue soit vide
-        await Promise.resolve();
+        await new Promise(resolve => setTimeout(resolve, 100));
         
         expect(callbackMock).toHaveBeenCalled();
     });
