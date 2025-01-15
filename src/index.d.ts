@@ -89,6 +89,16 @@ declare module "@killiandvcz/maestro" {
        * Checks if timer is active (started and not completed)
        */
       isActive(): boolean;
+
+      /**
+       * Cleans up all resources and references
+       */
+      dispose(): void;
+
+      /**
+       * Cancels the timer and cleans up all resources
+       */
+      clear(): this;
   }
 
   export class Group {
@@ -160,6 +170,11 @@ declare module "@killiandvcz/maestro" {
        * Restarts all timers with the same remaining time ratio
        */
       restartSynchronized(): this;
+
+      /**
+       * Cleans up all resources and references of the group
+       */
+      dispose(): void;
   }
 
   export interface TimerSequenceConfig extends TimerConfig {
